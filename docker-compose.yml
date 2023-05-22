@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data_rust_todo_api_dev:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rust_todo_api_dev
+    ports:
+      - 5432:5432
+
+volumes:
+  postgres_data_rust_todo_api_dev:
