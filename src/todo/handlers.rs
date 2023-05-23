@@ -1,68 +1,87 @@
 use axum::{
     extract::{Path, Query},
-    http::StatusCode,
-    response::IntoResponse,
     Extension, Json,
 };
-use serde_json::json;
 use sqlx::PgPool;
 
 use crate::common::pagination::PaginationParams;
-use crate::todo::models::{EditTodo, NewTodo};
-use crate::todo::repository;
+use crate::errors::ApiError;
+use crate::todo::{
+    models::{EditTodo, NewTodo, Todo},
+    repository,
+};
 
 pub async fn create_todo(
     Extension(pool): Extension<PgPool>,
     Json(todo): Json<NewTodo>,
-) -> impl IntoResponse {
-    let todo = repository::create_todo(pool, todo)
-        .await
-        .expect("Failed to create todo");
+) -> Result<Json<Todo>, ApiError> {
+    let todo = repository::create_todo(pool, todo).await;
 
-    (StatusCode::CREATED, Json(todo))
+    match todo {
+        Ok(todo) => Ok(Json(todo)),
+        Err(e) => Err(ApiError::new_internal(e.to_string())),
+    }
 }
 
 pub async fn find_todos(
     Extension(pool): Extension<PgPool>,
     Query(query): Query<PaginationParams>,
-) -> impl IntoResponse {
+) -> Result<Json<Vec<Todo>>, ApiError> {
     let (page, limit) = (query.page.unwrap_or(1), query.limit.unwrap_or(10));
 
-    let todos = repository::find_todos(pool, page, limit)
-        .await
-        .expect("Failed to retrieve todos from database");
+    let todos = repository::find_todos(pool, page, limit).await;
 
-    (StatusCode::OK, Json(json!({ "todos": todos })))
+    match todos {
+        Ok(todos) => Ok(Json(todos)),
+        Err(e) => Err(ApiError::new_internal(e.to_string())),
+    }
 }
 
 pub async fn find_todo_by_id(
     Extension(pool): Extension<PgPool>,
     Path(id): Path<i32>,
-) -> impl IntoResponse {
-    let todo = repository::find_todo_by_id(pool, id)
-        .await
-        .expect("Failed to retrieve todo from database");
+) -> Result<Json<Todo>, ApiError> {
+    let todo = repository::find_todo_by_id(pool, id).await;
 
-    (StatusCode::OK, Json(todo))
+    match todo {
+        Ok(todo) => Ok(Json(todo)),
+        Err(e) => match e {
+            sqlx::Error::RowNotFound => Err(ApiError::new_not_found(format!(
+                "Todo with id {} not found",
+                id
+            ))),
+            _ => Err(ApiError::new_internal(e.to_string())),
+        },
+    }
 }
 
 pub async fn edit_todo_by_id(
     Extension(pool): Extension<PgPool>,
     Path(id): Path<i32>,
     Json(todo): Json<EditTodo>,
-) -> impl IntoResponse {
-    let todo = repository::edit_todo(pool, id, todo)
-        .await
-        .expect("Failed to edit todo");
+) -> Result<Json<Todo>, ApiError> {
+    let todo = repository::edit_todo(pool, id, todo).await;
 
-    (StatusCode::OK, Json(todo))
+    match todo {
+        Ok(todo) => Ok(Json(todo)),
+        Err(e) => match e {
+            sqlx::Error::RowNotFound => Err(ApiError::new_not_found(format!(
+                "Todo with id {} not found",
+                id
+            ))),
+            _ => Err(ApiError::new_internal(e.to_string())),
+        },
+    }
 }
 
 pub async fn delete_todo_by_id(
     Extension(pool): Extension<PgPool>,
     Path(id): Path<i32>,
-) -> impl IntoResponse {
-    repository::delete_todo_by_id(pool, id).await;
+) -> Result<Json<()>, ApiError> {
+    let result = repository::delete_todo_by_id(pool, id).await;
 
-    StatusCode::NO_CONTENT
+    match result {
+        Ok(_) => Ok(Json(())),
+        Err(e) => Err(ApiError::new_internal(e.to_string())),
+    }
 }

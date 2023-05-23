@@ -97,7 +97,7 @@ pub(crate) async fn edit_todo(
     Ok(todo)
 }
 
-pub async fn delete_todo_by_id(pool: PgPool, id: i32) {
+pub async fn delete_todo_by_id(pool: PgPool, id: i32) -> Result<(), sqlx::Error> {
     sqlx::query(
         "
             DELETE FROM
@@ -108,6 +108,7 @@ pub async fn delete_todo_by_id(pool: PgPool, id: i32) {
     )
     .bind(id)
     .execute(&pool)
-    .await
-    .expect("Failed to delete todo");
+    .await?;
+
+    Ok(())
 }

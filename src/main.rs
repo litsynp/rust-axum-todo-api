@@ -1,4 +1,5 @@
 mod common;
+mod errors;
 mod infrastructure;
 mod routes;
 mod server;
