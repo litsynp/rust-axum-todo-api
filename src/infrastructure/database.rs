@@ -6,3 +6,10 @@ pub async fn get_postgres_pool(db_url: &str) -> Result<Pool<Postgres>, sqlx::Err
         .connect(db_url)
         .await
 }
+
+pub async fn migrate(pool: &Pool<Postgres>) {
+    sqlx::migrate!()
+        .run(pool)
+        .await
+        .expect("Failed to run migrations");
+}

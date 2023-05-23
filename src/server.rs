@@ -15,6 +15,8 @@ pub async fn create_server() {
         .as_str(),
     );
 
+    database::migrate(&pool).await;
+
     let router = routes::build_routes(pool);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
