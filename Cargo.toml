@@ -12,4 +12,6 @@ serde = { version = "1.0.130", features = ["derive"] }
 serde_json = "1.0.96"
 sqlx = { version = "0.6.3", features = ["runtime-tokio-native-tls", "postgres", "chrono"] }
 chrono = { version = "0.4.24", features = ["serde"] }
+tracing = "0.1.37"
+tracing-subscriber = "0.3.17"
 dotenv = "0.15.0"
