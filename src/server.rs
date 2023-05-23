@@ -4,16 +4,16 @@ use crate::infrastructure::database;
 use crate::routes;
 
 pub async fn create_server() {
-    // Get db_url from .env
     let db_url = dotenv::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    let pool = database::get_postgres_pool(db_url.as_str()).await.expect(
-        format!(
-            "Failed to connect to Postgres with provided URL: {}",
-            db_url
-        )
-        .as_str(),
-    );
+    let pool = database::get_postgres_pool(db_url.as_str())
+        .await
+        .unwrap_or_else(|_| {
+            panic!(
+                "Failed to connect to Postgres with provided URL: {}",
+                db_url
+            )
+        });
 
     database::migrate(&pool).await;
 

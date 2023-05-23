@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use sqlx;
 use sqlx::types::chrono;
 
 #[derive(sqlx::FromRow, Deserialize, Serialize)]
