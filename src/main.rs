@@ -1,5 +1,6 @@
 mod common;
 mod infrastructure;
+mod routes;
 mod server;
 mod todo;
 
