@@ -52,6 +52,14 @@ impl ApiError {
         }
     }
 
+    pub fn new_conflict(err: String) -> Self {
+        let errors: Vec<String> = vec![err];
+        ApiError {
+            status_code: StatusCode::CONFLICT.as_u16(),
+            errors,
+        }
+    }
+
     pub fn append_error(&mut self, err: String) {
         self.errors.push(err);
     }
