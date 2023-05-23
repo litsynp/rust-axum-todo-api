@@ -2,8 +2,8 @@ use std::net::SocketAddr;
 
 use tracing::info;
 
-use crate::infrastructure::database;
 use crate::routes;
+use rust_todo_api::infrastructure::database;
 
 pub async fn create_server() {
     tracing_subscriber::fmt::init();
