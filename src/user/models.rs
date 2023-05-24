@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use sqlx::types::chrono;
 
 #[derive(sqlx::FromRow, Deserialize, Serialize)]
 pub struct User {
@@ -10,11 +9,4 @@ pub struct User {
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
     pub deleted_at: Option<chrono::DateTime<chrono::Utc>>,
-}
-
-#[derive(sqlx::FromRow, Deserialize, Serialize)]
-pub struct NewUser {
-    pub email: String,
-    pub password: String,
-    pub nickname: String,
 }

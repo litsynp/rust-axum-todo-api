@@ -1,7 +1,11 @@
-use crate::todo::models::{EditTodo, NewTodo, Todo};
 use sqlx::PgPool;
 
-pub async fn create_todo(pool: PgPool, new_todo: NewTodo) -> Result<Todo, sqlx::Error> {
+use crate::todo::{
+    models::Todo,
+    views::{EditTodoRequest, NewTodoRequest},
+};
+
+pub async fn create_todo(pool: PgPool, new_todo: NewTodoRequest) -> Result<Todo, sqlx::Error> {
     let todo = sqlx::query_as::<_, Todo>(
         "
             INSERT INTO
@@ -70,7 +74,7 @@ pub async fn find_todo_by_id(pool: PgPool, id: i32) -> Result<Todo, sqlx::Error>
 pub(crate) async fn edit_todo(
     pool: PgPool,
     id: i32,
-    edited_todo: EditTodo,
+    edited_todo: EditTodoRequest,
 ) -> Result<Todo, sqlx::Error> {
     let todo = sqlx::query_as::<_, Todo>(
         "

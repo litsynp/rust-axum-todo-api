@@ -1,21 +1,20 @@
-use axum::extract::Query;
-use axum::{Extension, Json};
+use axum::{extract::Query, Extension, Json};
 use sqlx::PgPool;
 
 use crate::common::errors::ApiError;
 use crate::user::{
-    models::{NewUser, User},
     repository,
+    views::{NewUserRequest, UserView},
 };
 
 pub async fn register_user(
     Extension(pool): Extension<PgPool>,
-    Json(user): Json<NewUser>,
-) -> Result<Json<User>, ApiError> {
+    Json(user): Json<NewUserRequest>,
+) -> Result<Json<UserView>, ApiError> {
     let user = repository::register_user(pool, user).await;
 
     match user {
-        Ok(user) => Ok(Json(user)),
+        Ok(user) => Ok(Json(UserView::from(user))),
         Err(e) => match &e {
             sqlx::Error::Database(db_err) => {
                 if db_err.constraint().is_some() {
@@ -39,7 +38,7 @@ pub struct FindUserQuery {
 pub async fn find_user_by_email(
     Extension(pool): Extension<PgPool>,
     Query(query): Query<FindUserQuery>,
-) -> Result<Json<User>, ApiError> {
+) -> Result<Json<UserView>, ApiError> {
     let email = query.email;
 
     let email = match email {
@@ -54,7 +53,7 @@ pub async fn find_user_by_email(
     let user = repository::find_user_by_email(pool, email.as_str()).await;
 
     match user {
-        Ok(user) => Ok(Json(user)),
+        Ok(user) => Ok(Json(UserView::from(user))),
         Err(_) => Err(ApiError::new_not_found(format!(
             "User with email {} not found",
             email

@@ -11,10 +11,12 @@ pub mod todo {
     pub mod handlers;
     pub mod models;
     pub mod repository;
+    pub mod views;
 }
 
 pub mod user {
     pub mod handlers;
     pub mod models;
     pub mod repository;
+    pub mod views;
 }

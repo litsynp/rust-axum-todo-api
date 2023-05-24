@@ -1,7 +1,11 @@
-use crate::user::models::{NewUser, User};
 use sqlx::PgPool;
 
-pub async fn register_user(pool: PgPool, new_user: NewUser) -> Result<User, sqlx::Error> {
+use crate::user::{models::User, views::NewUserRequest};
+
+pub async fn register_user(
+    pool: PgPool,
+    new_user_request: NewUserRequest,
+) -> Result<User, sqlx::Error> {
     let user = sqlx::query_as::<_, User>(
         "
             INSERT INTO
@@ -20,9 +24,9 @@ pub async fn register_user(pool: PgPool, new_user: NewUser) -> Result<User, sqlx
                 *
             ",
     )
-    .bind(new_user.email)
-    .bind(new_user.password)
-    .bind(new_user.nickname)
+    .bind(new_user_request.email)
+    .bind(new_user_request.password)
+    .bind(new_user_request.nickname)
     .fetch_one(&pool)
     .await?;
 
