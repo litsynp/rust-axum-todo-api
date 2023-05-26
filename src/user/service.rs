@@ -1,22 +1,27 @@
 use sqlx::PgPool;
 
 use crate::common::password_encoder;
-use crate::user::{models::User, repository as user_repository, views::NewUserRequest};
+use crate::user::views::UserView;
+use crate::user::{repository as user_repository, views::NewUserRequest};
 
 pub async fn register_user(
     pool: PgPool,
     new_user_request: NewUserRequest,
-) -> Result<User, sqlx::Error> {
+) -> Result<UserView, sqlx::Error> {
     let new_user_request = NewUserRequest {
         password: password_encoder::encode_password(new_user_request.password.as_str()),
         ..new_user_request
     };
 
-    user_repository::register_user(pool, new_user_request).await
+    let user = user_repository::register_user(pool, new_user_request).await?;
+
+    Ok(UserView::from(user))
 }
 
-pub async fn find_user_by_email(pool: PgPool, email: &str) -> Result<User, sqlx::Error> {
-    user_repository::find_user_by_email(pool, email).await
+pub async fn find_user_by_email(pool: PgPool, email: &str) -> Result<UserView, sqlx::Error> {
+    let user = user_repository::find_user_by_email(pool, email).await?;
+
+    Ok(UserView::from(user))
 }
 
 #[cfg(test)]

@@ -9,12 +9,12 @@ use crate::user::{
 
 pub async fn register_user(
     Extension(pool): Extension<PgPool>,
-    Json(user): Json<NewUserRequest>,
+    Json(request): Json<NewUserRequest>,
 ) -> Result<Json<UserView>, ApiError> {
-    let user = user_service::register_user(pool, user).await;
+    let user_view = user_service::register_user(pool, request).await;
 
-    match user {
-        Ok(user) => Ok(Json(UserView::from(user))),
+    match user_view {
+        Ok(user_view) => Ok(Json(user_view)),
         Err(e) => match &e {
             sqlx::Error::Database(db_err) => {
                 if db_err.constraint().is_some() {
@@ -50,10 +50,10 @@ pub async fn find_user_by_email(
         }
     };
 
-    let user = user_service::find_user_by_email(pool, email.as_str()).await;
+    let user_view = user_service::find_user_by_email(pool, email.as_str()).await;
 
-    match user {
-        Ok(user) => Ok(Json(UserView::from(user))),
+    match user_view {
+        Ok(user_view) => Ok(Json(user_view)),
         Err(_) => Err(ApiError::new_not_found(format!(
             "User with email {} not found",
             email
