@@ -71,7 +71,7 @@ pub async fn find_todo_by_id(pool: PgPool, id: i32) -> Result<Todo, sqlx::Error>
     Ok(todo)
 }
 
-pub(crate) async fn edit_todo(
+pub(crate) async fn edit_todo_by_id(
     pool: PgPool,
     id: i32,
     edited_todo: EditTodoRequest,
