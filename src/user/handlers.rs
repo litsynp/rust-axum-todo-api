@@ -3,7 +3,7 @@ use sqlx::PgPool;
 
 use crate::common::errors::ApiError;
 use crate::user::{
-    repository,
+    service as user_service,
     views::{NewUserRequest, UserView},
 };
 
@@ -11,7 +11,7 @@ pub async fn register_user(
     Extension(pool): Extension<PgPool>,
     Json(user): Json<NewUserRequest>,
 ) -> Result<Json<UserView>, ApiError> {
-    let user = repository::register_user(pool, user).await;
+    let user = user_service::register_user(pool, user).await;
 
     match user {
         Ok(user) => Ok(Json(UserView::from(user))),
@@ -50,7 +50,7 @@ pub async fn find_user_by_email(
         }
     };
 
-    let user = repository::find_user_by_email(pool, email.as_str()).await;
+    let user = user_service::find_user_by_email(pool, email.as_str()).await;
 
     match user {
         Ok(user) => Ok(Json(UserView::from(user))),
