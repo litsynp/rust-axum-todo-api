@@ -1,9 +1,8 @@
 use sqlx::PgPool;
 
-use crate::todo::views::EditTodoRequest;
 use crate::todo::{
     repository as todo_repository,
-    views::{NewTodoRequest, TodoView},
+    views::{EditTodoRequest, NewTodoRequest, TodoView},
 };
 
 pub async fn create_todo(pool: PgPool, new_todo: NewTodoRequest) -> Result<TodoView, sqlx::Error> {
