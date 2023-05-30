@@ -17,7 +17,7 @@ pub async fn create_todo(
     let todo = todo_service::create_todo(pool, todo).await;
 
     match todo {
-        Ok(todo) => Ok(Json(todo)),
+        Ok(todo) => Ok(Json(TodoView::from(todo))),
         Err(e) => Err(ApiError::new_internal(e.to_string())),
     }
 }
@@ -28,10 +28,12 @@ pub async fn find_todos(
 ) -> Result<Json<Vec<TodoView>>, ApiError> {
     let (page, limit) = (query.page.unwrap_or(1), query.limit.unwrap_or(10));
 
-    let todo_views = todo_service::find_todos(pool, page, limit).await;
+    let todos = todo_service::find_todos(pool, page, limit).await;
 
-    match todo_views {
-        Ok(todo_views) => Ok(Json(todo_views)),
+    match todos {
+        Ok(todos) => Ok(Json(
+            todos.into_iter().map(|todo| TodoView::from(todo)).collect(),
+        )),
         Err(e) => Err(ApiError::new_internal(e.to_string())),
     }
 }
@@ -43,7 +45,7 @@ pub async fn find_todo_by_id(
     let todo = todo_service::find_todo_by_id(pool, id).await;
 
     match todo {
-        Ok(todo) => Ok(Json(todo)),
+        Ok(todo) => Ok(Json(TodoView::from(todo))),
         Err(e) => match e {
             sqlx::Error::RowNotFound => Err(ApiError::new_not_found(format!(
                 "Todo with id {} not found",
@@ -62,7 +64,7 @@ pub async fn edit_todo_by_id(
     let todo = todo_service::edit_todo_by_id(pool, id, todo).await;
 
     match todo {
-        Ok(todo) => Ok(Json(todo)),
+        Ok(todo) => Ok(Json(TodoView::from(todo))),
         Err(e) => match e {
             sqlx::Error::RowNotFound => Err(ApiError::new_not_found(format!(
                 "Todo with id {} not found",

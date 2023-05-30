@@ -11,10 +11,10 @@ pub async fn register_user(
     Extension(pool): Extension<PgPool>,
     Json(request): Json<NewUserRequest>,
 ) -> Result<Json<UserView>, ApiError> {
-    let user_view = user_service::register_user(pool, request).await;
+    let user = user_service::register_user(pool, request).await;
 
-    match user_view {
-        Ok(user_view) => Ok(Json(user_view)),
+    match user {
+        Ok(user) => Ok(Json(UserView::from(user))),
         Err(e) => match &e {
             sqlx::Error::Database(db_err) => {
                 if db_err.constraint().is_some() {
@@ -50,10 +50,10 @@ pub async fn find_user_by_email(
         }
     };
 
-    let user_view = user_service::find_user_by_email(pool, email.as_str()).await;
+    let user = user_service::find_user_by_email(pool, email.as_str()).await;
 
-    match user_view {
-        Ok(user_view) => Ok(Json(user_view)),
+    match user {
+        Ok(user) => Ok(Json(UserView::from(user))),
         Err(_) => Err(ApiError::new_not_found(format!(
             "User with email {} not found",
             email

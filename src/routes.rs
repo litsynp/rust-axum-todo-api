@@ -1,11 +1,18 @@
-use axum::{routing::get, Extension, Json, Router};
+use axum::{
+    routing::{get, post},
+    Extension, Json, Router,
+};
 use serde_json::json;
 use sqlx::{Pool, Postgres};
 
-use rust_todo_api::{todo, user};
+use rust_todo_api::{auth, todo, user};
 
 pub fn build_routes(pool: Pool<Postgres>) -> Router {
     let api_routes = Router::new()
+        .nest(
+            "/auth",
+            Router::new().route("/tokens", post(auth::handlers::get_tokens)),
+        )
         .nest(
             "/todos",
             Router::new()

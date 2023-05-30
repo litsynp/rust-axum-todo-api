@@ -8,6 +8,13 @@ pub mod infrastructure {
     pub mod database;
 }
 
+pub mod auth {
+    pub mod handlers;
+    pub mod models;
+    pub mod utils;
+    pub mod views;
+}
+
 pub mod todo {
     pub mod handlers;
     pub mod models;

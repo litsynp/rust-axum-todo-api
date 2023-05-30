@@ -33,6 +33,31 @@ pub async fn register_user(
     Ok(user)
 }
 
+pub async fn find_user_by_email_and_password(
+    pool: PgPool,
+    email: &str,
+    password: &str,
+) -> Result<User, sqlx::Error> {
+    let user = sqlx::query_as::<_, User>(
+        "
+          SELECT
+              *
+          FROM
+              users
+          WHERE
+              email = $1 AND
+              password = $2 AND
+              deleted_at IS NULL
+          ",
+    )
+    .bind(email)
+    .bind(password)
+    .fetch_one(&pool)
+    .await?;
+
+    Ok(user)
+}
+
 pub async fn find_user_by_email(pool: PgPool, email: &str) -> Result<User, sqlx::Error> {
     let user = sqlx::query_as::<_, User>(
         "
