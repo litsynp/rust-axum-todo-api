@@ -44,6 +44,14 @@ impl ApiError {
         }
     }
 
+    pub fn new_unauthorized(err: String) -> Self {
+        let errors: Vec<String> = vec![err];
+        ApiError {
+            status_code: StatusCode::UNAUTHORIZED.as_u16(),
+            errors,
+        }
+    }
+
     pub fn new_not_found(err: String) -> Self {
         let errors: Vec<String> = vec![err];
         ApiError {

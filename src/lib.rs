@@ -1,5 +1,6 @@
 pub mod common {
     pub mod errors;
+    pub mod middlewares;
     pub mod pagination;
     pub mod password_encoder;
 }

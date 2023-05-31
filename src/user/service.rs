@@ -20,6 +20,10 @@ pub async fn find_user_by_email(pool: PgPool, email: &str) -> Result<User, sqlx:
     user_repository::find_user_by_email(pool, email).await
 }
 
+pub async fn find_user_by_id(pool: PgPool, id: i32) -> Result<User, sqlx::Error> {
+    user_repository::find_user_by_id(pool, id).await
+}
+
 pub async fn login(pool: PgPool, email: &str, password: &str) -> Result<User, sqlx::Error> {
     let user = user_repository::find_user_by_email(pool, email).await?;
 

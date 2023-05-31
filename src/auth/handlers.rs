@@ -1,19 +1,19 @@
-use axum::{Extension, Json};
-use sqlx::PgPool;
+use axum::{extract::State, Json};
 
 use crate::{
-    auth::views::TokenView,
-    auth::{utils, views::LoginRequest},
-    common::errors::ApiError,
+    auth::{models::JWT_SECRET, utils, views::LoginRequest, views::TokenView},
+    common::{errors::ApiError, middlewares::AuthState},
     user::service as user_service,
 };
 
-static ACCESS_EXPIRY: usize = 60 * 60 * 1000;
-static REFRESH_EXPIRY: usize = 24 * 60 * 60 * 1000;
-static JWT_SECRET: &str = "foobar";
+static ACCESS_EXPIRY: usize = 60 * 60 * 100000000;
+static REFRESH_EXPIRY: usize = 24 * 60 * 60 * 100000000;
 
 pub async fn get_tokens(
-    Extension(pool): Extension<PgPool>,
+    State(AuthState {
+        pool,
+        jwt_secret: _,
+    }): State<AuthState>,
     Json(request): Json<LoginRequest>,
 ) -> Result<Json<TokenView>, ApiError> {
     let LoginRequest { email, password } = request;

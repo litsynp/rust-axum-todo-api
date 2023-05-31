@@ -2,12 +2,14 @@ use serde::{Deserialize, Serialize};
 
 use crate::user::models::User;
 
+pub static JWT_SECRET: &str = "foobar";
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    sub: String,
-    user_id: i32,
-    token_type: String,
-    exp: usize,
+    pub sub: String,
+    pub user_id: i32,
+    pub token_type: String,
+    pub exp: usize,
 }
 
 impl Claims {

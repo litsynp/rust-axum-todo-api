@@ -1,14 +1,21 @@
-use axum::{extract::Query, Extension, Json};
-use sqlx::PgPool;
+use axum::{
+    extract::{Query, State},
+    Json,
+};
 
-use crate::common::errors::ApiError;
-use crate::user::{
-    service as user_service,
-    views::{NewUserRequest, UserView},
+use crate::{
+    common::{errors::ApiError, middlewares::AuthState},
+    user::{
+        service as user_service,
+        views::{NewUserRequest, UserView},
+    },
 };
 
 pub async fn register_user(
-    Extension(pool): Extension<PgPool>,
+    State(AuthState {
+        pool,
+        jwt_secret: _,
+    }): State<AuthState>,
     Json(request): Json<NewUserRequest>,
 ) -> Result<Json<UserView>, ApiError> {
     let user = user_service::register_user(pool, request).await;
@@ -36,7 +43,10 @@ pub struct FindUserQuery {
 }
 
 pub async fn find_user_by_email(
-    Extension(pool): Extension<PgPool>,
+    State(AuthState {
+        pool,
+        jwt_secret: _,
+    }): State<AuthState>,
     Query(query): Query<FindUserQuery>,
 ) -> Result<Json<UserView>, ApiError> {
     let email = query.email;

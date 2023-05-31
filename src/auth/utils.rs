@@ -1,8 +1,6 @@
-use jsonwebtoken::errors::Error;
-use jsonwebtoken::{encode, EncodingKey, Header};
+use jsonwebtoken::{encode, errors::Error, DecodingKey, EncodingKey, Header};
 
-use crate::auth::models::Claims;
-use crate::user::models::User;
+use crate::{auth::models::Claims, user::models::User};
 
 pub fn encode_token(
     user: &User,
@@ -18,4 +16,14 @@ pub fn encode_token(
     )?;
 
     Ok(token)
+}
+
+pub fn validate_token(token: &str, secret: &str) -> Result<Claims, Error> {
+    let token = jsonwebtoken::decode::<Claims>(
+        token,
+        &DecodingKey::from_secret(secret.as_ref()),
+        &jsonwebtoken::Validation::default(),
+    )?;
+
+    Ok(token.claims)
 }
