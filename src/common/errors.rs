@@ -22,7 +22,7 @@ impl Display for ApiError {
 
 impl ApiError {
     pub fn new(status_code: u16, err: String) -> Self {
-        let errors: Vec<String> = vec![err];
+        let errors = vec![err];
         ApiError {
             status_code,
             errors,
@@ -30,14 +30,14 @@ impl ApiError {
     }
 
     pub fn new_internal(err: String) -> Self {
-        let errors: Vec<String> = vec![err];
+        let errors = vec![err];
         ApiError {
             status_code: StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
             errors,
         }
     }
     pub fn new_bad_request(err: String) -> Self {
-        let errors: Vec<String> = vec![err];
+        let errors = vec![err];
         ApiError {
             status_code: StatusCode::BAD_REQUEST.as_u16(),
             errors,
@@ -45,7 +45,7 @@ impl ApiError {
     }
 
     pub fn new_unauthorized(err: String) -> Self {
-        let errors: Vec<String> = vec![err];
+        let errors = vec![err];
         ApiError {
             status_code: StatusCode::UNAUTHORIZED.as_u16(),
             errors,
@@ -53,7 +53,7 @@ impl ApiError {
     }
 
     pub fn new_not_found(err: String) -> Self {
-        let errors: Vec<String> = vec![err];
+        let errors = vec![err];
         ApiError {
             status_code: StatusCode::NOT_FOUND.as_u16(),
             errors,
@@ -61,7 +61,7 @@ impl ApiError {
     }
 
     pub fn new_conflict(err: String) -> Self {
-        let errors: Vec<String> = vec![err];
+        let errors = vec![err];
         ApiError {
             status_code: StatusCode::CONFLICT.as_u16(),
             errors,

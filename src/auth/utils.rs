@@ -5,7 +5,7 @@ use crate::{auth::models::Claims, user::models::User};
 pub fn encode_token(
     user: &User,
     exp: usize,
-    token_type: String,
+    token_type: &str,
     secret: &str,
 ) -> Result<String, Error> {
     let claims = Claims::from_user(user, token_type, exp);

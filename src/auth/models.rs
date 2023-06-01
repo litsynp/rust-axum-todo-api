@@ -13,11 +13,11 @@ pub struct Claims {
 }
 
 impl Claims {
-    pub fn from_user(user: &User, token_type: String, exp: usize) -> Self {
+    pub fn from_user(user: &User, token_type: &str, exp: usize) -> Self {
         Claims {
             sub: user.nickname.clone(),
             user_id: user.id,
-            token_type,
+            token_type: token_type.to_string(),
             exp,
         }
     }

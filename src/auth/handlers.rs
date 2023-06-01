@@ -23,11 +23,9 @@ pub async fn get_tokens(
     match user {
         Ok(user) => {
             let access_token =
-                utils::encode_token(&user, ACCESS_EXPIRY, "access".to_string(), JWT_SECRET)
-                    .unwrap();
+                utils::encode_token(&user, ACCESS_EXPIRY, "access", JWT_SECRET).unwrap();
             let refresh_token =
-                utils::encode_token(&user, REFRESH_EXPIRY, "refresh".to_string(), JWT_SECRET)
-                    .unwrap();
+                utils::encode_token(&user, REFRESH_EXPIRY, "refresh", JWT_SECRET).unwrap();
 
             Ok(Json(TokenView {
                 user_id: user.id,
