@@ -45,8 +45,8 @@ pub async fn find_todos(pool: PgPool, page: i32, size: i32) -> Result<Vec<Todo>,
                 $2
             ",
     )
-    .bind(20)
     .bind((page - 1) * size)
+    .bind(size)
     .fetch_all(&pool)
     .await?;
 
