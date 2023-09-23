@@ -7,8 +7,9 @@ use axum::{
 };
 use serde::Serialize;
 use thiserror::Error;
+use utoipa::ToSchema;
 
-#[derive(Serialize, Error, Debug)]
+#[derive(Serialize, Error, Debug, ToSchema)]
 pub struct ApiError {
     status_code: u16,
     errors: Vec<String>,

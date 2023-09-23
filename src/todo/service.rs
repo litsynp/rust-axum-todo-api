@@ -10,8 +10,8 @@ pub async fn create_todo(pool: PgPool, new_todo: NewTodoRequest) -> Result<Todo,
     todo_repository::create_todo(pool, new_todo).await
 }
 
-pub async fn find_todos(pool: PgPool, page: i32, limit: i32) -> Result<Vec<Todo>, sqlx::Error> {
-    todo_repository::find_todos(pool, page, limit).await
+pub async fn find_todos(pool: PgPool, page: i32, size: i32) -> Result<Vec<Todo>, sqlx::Error> {
+    todo_repository::find_todos(pool, page, size).await
 }
 
 pub async fn find_todo_by_id(pool: PgPool, id: i32) -> Result<Todo, sqlx::Error> {
