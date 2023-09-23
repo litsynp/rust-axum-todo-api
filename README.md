@@ -19,6 +19,8 @@ A Rust example of a todo application with axum and sqlx.
 - serde
 - serde_json
 - dotenv
+- chrono
+- utoipa
 
 ## Run the Application
 
@@ -47,6 +49,13 @@ $ cargo run
 $ cargo build --release
 $ ./target/release/rust-todo-api
 ```
+
+## Swagger / OpenAPI
+
+Access the Swagger UI at [`/swagger-ui`](http://localhost:8000/swagger-ui) and the OpenAPI spec
+at [`/api-docs/openapi.json`](http://localhost:8000/api-docs/openapi.json).
+
+You can also use RapiDoc at [`/rapidoc`](http://localhost:8000/rapidoc).
 
 ## Troubleshooting
 

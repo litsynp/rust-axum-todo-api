@@ -10,15 +10,28 @@ use crate::{
         views::{EditTodoRequest, NewTodoRequest, TodoView},
     },
 };
+use crate::common::pagination::PaginatedView;
 
+/// Create todo
+// @formatter:off
+#[utoipa::path(
+    post,
+    operation_id = "create_todo",
+    path = "/api/todos",
+    tag = "todo",
+    request_body = NewTodoRequest,
+    responses(
+        (status = 200, description = "Todo created", body = TodoView),
+        (status = 401, description = "Unauthorized", body = ApiError),
+        (status = 500, description = "Todo creation failed", body = ApiError)
+    ),
+    security(("api_key" = []))
+)] // @formatter:on
 pub async fn create_todo(
-    State(AuthState {
-        pool,
-        jwt_secret: _,
-    }): State<AuthState>,
+    State(state): State<AuthState>,
     Json(todo): Json<NewTodoRequest>,
 ) -> Result<Json<TodoView>, ApiError> {
-    let todo = todo_service::create_todo(pool, todo).await;
+    let todo = todo_service::create_todo(state.pool, todo).await;
 
     match todo {
         Ok(todo) => Ok(Json(TodoView::from(todo))),
@@ -26,31 +39,63 @@ pub async fn create_todo(
     }
 }
 
+/// Find todos
+// @formatter:off
+#[utoipa::path(
+    get,
+    operation_id = "find_todos",
+    path = "/api/todos",
+    tag = "todo",
+    params(PaginationParams),
+    responses(
+        (status = 200, description = "Todos found", body = PaginatedTodoView),
+        (status = 401, description = "Unauthorized", body = ApiError),
+        (status = 500, description = "Todos not found", body = ApiError)
+    ),
+    security(("api_key" = []))
+)] // @formatter:on
 pub async fn find_todos(
-    State(AuthState {
-        pool,
-        jwt_secret: _,
-    }): State<AuthState>,
+    State(state): State<AuthState>,
     Query(query): Query<PaginationParams>,
-) -> Result<Json<Vec<TodoView>>, ApiError> {
-    let (page, limit) = (query.page.unwrap_or(1), query.limit.unwrap_or(10));
+) -> Result<Json<PaginatedView<TodoView>>, ApiError> {
+    let (page, size) = (query.page.unwrap_or(1), query.size.unwrap_or(10));
 
-    let todos = todo_service::find_todos(pool, page, limit).await;
+    let todos = todo_service::find_todos(state.pool, page, size).await;
 
     match todos {
-        Ok(todos) => Ok(Json(todos.into_iter().map(TodoView::from).collect())),
+        Ok(todos) => Ok(Json(
+            PaginatedView {
+                page,
+                size,
+                items: todos.into_iter().map(TodoView::from).collect(),
+            })),
         Err(e) => Err(ApiError::new_internal(e.to_string())),
     }
 }
 
+/// Find todo by id
+// @formatter:off
+#[utoipa::path(
+    get,
+    operation_id = "find_todo_by_id",
+    path = "/api/todos/{id}",
+    tag = "todo",
+    params(
+        ("id" = i32, description = "Todo id")
+    ),
+    responses(
+        (status = 200, description = "Todo found", body = TodoView),
+        (status = 401, description = "Unauthorized", body = ApiError),
+        (status = 404, description = "Todo not found", body = ApiError),
+        (status = 500, description = "Todo not found", body = ApiError)
+    ),
+    security(("api_key" = []))
+)] // @formatter:on
 pub async fn find_todo_by_id(
-    State(AuthState {
-        pool,
-        jwt_secret: _,
-    }): State<AuthState>,
+    State(state): State<AuthState>,
     Path(id): Path<i32>,
 ) -> Result<Json<TodoView>, ApiError> {
-    let todo = todo_service::find_todo_by_id(pool, id).await;
+    let todo = todo_service::find_todo_by_id(state.pool, id).await;
 
     match todo {
         Ok(todo) => Ok(Json(TodoView::from(todo))),
@@ -64,15 +109,31 @@ pub async fn find_todo_by_id(
     }
 }
 
+/// Edit todo by id
+// @formatter:off
+#[utoipa::path(
+    put,
+    operation_id = "edit_todo_by_id",
+    path = "/api/todos/{id}",
+    tag = "todo",
+    params(
+        ("id" = i32, description = "Todo id")
+    ),
+    request_body = EditTodoRequest,
+    responses(
+        (status = 200, description = "Todo edited", body = TodoView),
+        (status = 401, description = "Unauthorized", body = ApiError),
+        (status = 404, description = "Todo not found", body = ApiError),
+        (status = 500, description = "Todo not found", body = ApiError)
+    ),
+    security(("api_key" = []))
+)] // @formatter:on
 pub async fn edit_todo_by_id(
-    State(AuthState {
-        pool,
-        jwt_secret: _,
-    }): State<AuthState>,
+    State(state): State<AuthState>,
     Path(id): Path<i32>,
     Json(todo): Json<EditTodoRequest>,
 ) -> Result<Json<TodoView>, ApiError> {
-    let todo = todo_service::edit_todo_by_id(pool, id, todo).await;
+    let todo = todo_service::edit_todo_by_id(state.pool, id, todo).await;
 
     match todo {
         Ok(todo) => Ok(Json(TodoView::from(todo))),
@@ -86,17 +147,31 @@ pub async fn edit_todo_by_id(
     }
 }
 
+/// Delete todo by id
+// @formatter:off
+#[utoipa::path(
+    delete,
+    operation_id = "delete_todo_by_id",
+    path = "/api/todos/{id}",
+    tag = "todo",
+    params(
+        ("id" = i32, description = "Todo id")
+    ),
+    responses(
+        (status = 200, description = "Todo deleted"),
+        (status = 401, description = "Unauthorized", body = ApiError),
+        (status = 500, description = "Todo not found", body = ApiError)
+    ),
+    security(("api_key" = []))
+)] // @formatter:on
 pub async fn delete_todo_by_id(
-    State(AuthState {
-        pool,
-        jwt_secret: _,
-    }): State<AuthState>,
+    State(state): State<AuthState>,
     Path(id): Path<i32>,
-) -> Result<Json<()>, ApiError> {
-    let result = todo_service::delete_todo_by_id(pool, id).await;
+) -> Result<(), ApiError> {
+    let result = todo_service::delete_todo_by_id(state.pool, id).await;
 
     match result {
-        Ok(_) => Ok(Json(())),
+        Ok(_) => Ok(()),
         Err(e) => Err(ApiError::new_internal(e.to_string())),
     }
 }

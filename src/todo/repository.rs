@@ -30,7 +30,7 @@ pub async fn create_todo(pool: PgPool, new_todo: NewTodoRequest) -> Result<Todo,
     Ok(todo)
 }
 
-pub async fn find_todos(pool: PgPool, page: i32, limit: i32) -> Result<Vec<Todo>, sqlx::Error> {
+pub async fn find_todos(pool: PgPool, page: i32, size: i32) -> Result<Vec<Todo>, sqlx::Error> {
     let todos = sqlx::query_as::<_, Todo>(
         "
             SELECT
@@ -45,8 +45,8 @@ pub async fn find_todos(pool: PgPool, page: i32, limit: i32) -> Result<Vec<Todo>
                 $2
             ",
     )
-    .bind((page - 1) * limit)
     .bind(20)
+    .bind((page - 1) * size)
     .fetch_all(&pool)
     .await?;
 
