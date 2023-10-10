@@ -13,7 +13,6 @@ use crate::{
 };
 
 /// Register user
-// @formatter:off
 #[utoipa::path(
     post,
     operation_id = "register_user",
@@ -26,7 +25,7 @@ use crate::{
         (status = 409, description = "User already exists", body = ApiError),
         (status = 500, description = "User creation failed", body = ApiError)
     )
-)] // @formatter:on
+)]
 pub async fn register_user(
     State(state): State<AuthState>,
     Json(request): Json<NewUserRequest>,
@@ -56,7 +55,6 @@ pub struct FindUserQuery {
 }
 
 /// Find user by email
-// @formatter:off
 #[utoipa::path(
     get,
     operation_id = "find_user_by_email",
@@ -69,7 +67,7 @@ pub struct FindUserQuery {
         (status = 404, description = "User not found", body = ApiError),
     ),
     security(("api_key" = []))
-)] // @formatter:on
+)]
 pub async fn find_user_by_email(
     State(state): State<AuthState>,
     Query(query): Query<FindUserQuery>,

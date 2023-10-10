@@ -10,7 +10,6 @@ static ACCESS_EXPIRY: usize = 60 * 60 * 100000000;
 static REFRESH_EXPIRY: usize = 24 * 60 * 60 * 100000000;
 
 /// Get tokens for login
-// @formatter:off
 #[utoipa::path(
     post,
     operation_id = "get_tokens",
@@ -21,7 +20,7 @@ static REFRESH_EXPIRY: usize = 24 * 60 * 60 * 100000000;
         (status = 200, description = "Login succeeded", body = TokenView),
         (status = 400, description = "Login failed", body = ApiError)
     )
-)] // @formatter:on
+)]
 pub async fn get_tokens(
     State(store): State<AuthState>,
     Json(request): Json<LoginRequest>,

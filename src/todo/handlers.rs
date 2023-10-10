@@ -3,6 +3,7 @@ use axum::{
     Json,
 };
 
+use crate::common::pagination::PaginatedView;
 use crate::{
     common::{errors::ApiError, middlewares::AuthState, pagination::PaginationParams},
     todo::{
@@ -10,10 +11,8 @@ use crate::{
         views::{EditTodoRequest, NewTodoRequest, TodoView},
     },
 };
-use crate::common::pagination::PaginatedView;
 
 /// Create todo
-// @formatter:off
 #[utoipa::path(
     post,
     operation_id = "create_todo",
@@ -26,7 +25,7 @@ use crate::common::pagination::PaginatedView;
         (status = 500, description = "Todo creation failed", body = ApiError)
     ),
     security(("api_key" = []))
-)] // @formatter:on
+)]
 pub async fn create_todo(
     State(state): State<AuthState>,
     Json(todo): Json<NewTodoRequest>,
@@ -40,7 +39,6 @@ pub async fn create_todo(
 }
 
 /// Find todos
-// @formatter:off
 #[utoipa::path(
     get,
     operation_id = "find_todos",
@@ -53,7 +51,7 @@ pub async fn create_todo(
         (status = 500, description = "Todos not found", body = ApiError)
     ),
     security(("api_key" = []))
-)] // @formatter:on
+)]
 pub async fn find_todos(
     State(state): State<AuthState>,
     Query(query): Query<PaginationParams>,
@@ -63,18 +61,16 @@ pub async fn find_todos(
     let todos = todo_service::find_todos(state.pool, page, size).await;
 
     match todos {
-        Ok(todos) => Ok(Json(
-            PaginatedView {
-                page,
-                size,
-                items: todos.into_iter().map(TodoView::from).collect(),
-            })),
+        Ok(todos) => Ok(Json(PaginatedView {
+            page,
+            size,
+            items: todos.into_iter().map(TodoView::from).collect(),
+        })),
         Err(e) => Err(ApiError::new_internal(e.to_string())),
     }
 }
 
 /// Find todo by id
-// @formatter:off
 #[utoipa::path(
     get,
     operation_id = "find_todo_by_id",
@@ -90,7 +86,7 @@ pub async fn find_todos(
         (status = 500, description = "Todo not found", body = ApiError)
     ),
     security(("api_key" = []))
-)] // @formatter:on
+)]
 pub async fn find_todo_by_id(
     State(state): State<AuthState>,
     Path(id): Path<i32>,
@@ -110,7 +106,6 @@ pub async fn find_todo_by_id(
 }
 
 /// Edit todo by id
-// @formatter:off
 #[utoipa::path(
     put,
     operation_id = "edit_todo_by_id",
@@ -127,7 +122,7 @@ pub async fn find_todo_by_id(
         (status = 500, description = "Todo not found", body = ApiError)
     ),
     security(("api_key" = []))
-)] // @formatter:on
+)]
 pub async fn edit_todo_by_id(
     State(state): State<AuthState>,
     Path(id): Path<i32>,
@@ -148,7 +143,6 @@ pub async fn edit_todo_by_id(
 }
 
 /// Delete todo by id
-// @formatter:off
 #[utoipa::path(
     delete,
     operation_id = "delete_todo_by_id",
@@ -163,7 +157,7 @@ pub async fn edit_todo_by_id(
         (status = 500, description = "Todo not found", body = ApiError)
     ),
     security(("api_key" = []))
-)] // @formatter:on
+)]
 pub async fn delete_todo_by_id(
     State(state): State<AuthState>,
     Path(id): Path<i32>,

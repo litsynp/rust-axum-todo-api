@@ -13,11 +13,15 @@ use utoipa_rapidoc::RapiDoc;
 // use utoipa_redoc::{Redoc, Servable};  // Uncomment to enable Redoc
 use utoipa_swagger_ui::SwaggerUi;
 
-use rust_todo_api::{auth::{self, models::JWT_SECRET}, common, common::middlewares::{auth_middleware, AuthState}, todo, user};
+use rust_todo_api::{
+    auth::{self, models::JWT_SECRET},
+    common,
+    common::middlewares::{auth_middleware, AuthState},
+    todo, user,
+};
 
 pub fn build_routes(pool: Pool<Postgres>) -> Router {
     #[derive(OpenApi)]
-    // @formatter:off
     #[openapi(
         paths(
             auth::handlers::get_tokens,
@@ -62,7 +66,6 @@ pub fn build_routes(pool: Pool<Postgres>) -> Router {
             (name = "todo", description = "Todo API")
         )
     )]
-    // @formatter:on
     struct ApiDoc;
 
     struct SecurityAddon;
@@ -110,13 +113,11 @@ pub fn build_routes(pool: Pool<Postgres>) -> Router {
             Router::new()
                 .route(
                     "/",
-                    get(user::handlers::find_user_by_email)
-                        .route_layer(middleware::from_fn_with_state(
-                            auth_state.clone(),
-                            auth_middleware,
-                        )),
+                    get(user::handlers::find_user_by_email).route_layer(
+                        middleware::from_fn_with_state(auth_state.clone(), auth_middleware),
+                    ),
                 )
-                .route("/", post(user::handlers::register_user), ),
+                .route("/", post(user::handlers::register_user)),
         );
 
     Router::new()
