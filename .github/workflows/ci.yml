@@ -1,5 +1,9 @@
 # https://github.com/actions-rs/example/blob/master/.github/workflows/quickstart.yml
-on: [ push, pull_request ]
+on:
+  push:
+    branches: [ 'main', 'develop' ]
+  pull_request:
+    branches: [ 'main', 'develop' ]
 
 name: CI
 
@@ -7,6 +11,7 @@ jobs:
   check:
     name: Check
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -26,6 +31,23 @@ jobs:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_DB: rust_todo_api_dev
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -41,6 +63,9 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/rust_todo_api_dev
+
 
   lints:
     name: Lints
