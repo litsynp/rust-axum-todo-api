@@ -1,3 +1,4 @@
+use axum::body::Body;
 use axum::{extract::State, http::Request, middleware::Next, response::Response};
 use sqlx::{Pool, Postgres};
 
@@ -17,10 +18,10 @@ impl Clone for AuthState {
     }
 }
 
-pub async fn auth_middleware<B>(
+pub async fn auth_middleware(
     State(AuthState { pool, jwt_secret }): State<AuthState>,
-    mut req: Request<B>,
-    next: Next<B>,
+    mut req: Request<Body>,
+    next: Next,
 ) -> Result<Response, ApiError> {
     let header_token = match req.headers().get("Authorization") {
         Some(token) => token,
