@@ -1,4 +1,5 @@
-use std::net::SocketAddr;
+use std::net::{Ipv4Addr, SocketAddr};
+use tokio::net::TcpListener;
 
 use tracing::info;
 
@@ -23,11 +24,11 @@ pub async fn create_server() {
 
     let router = routes::build_routes(pool);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
+    let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 8000));
+    let listener = TcpListener::bind(&addr).await.unwrap();
     info!("Listening on {}", addr);
 
-    axum::Server::bind(&addr)
-        .serve(router.into_make_service())
+    axum::serve(listener, router.into_make_service())
         .await
         .unwrap();
 }
