@@ -4,6 +4,7 @@ use utoipa::ToSchema;
 use crate::todo::models::Todo;
 
 #[derive(sqlx::FromRow, Deserialize, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct TodoView {
     pub id: i32,
     pub title: String,
@@ -27,12 +28,14 @@ impl From<Todo> for TodoView {
 }
 
 #[derive(sqlx::FromRow, Deserialize, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct NewTodoRequest {
     pub title: String,
     pub description: String,
 }
 
 #[derive(sqlx::FromRow, Deserialize, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct EditTodoRequest {
     pub title: String,
     pub description: String,

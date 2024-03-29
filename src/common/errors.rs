@@ -10,6 +10,7 @@ use thiserror::Error;
 use utoipa::ToSchema;
 
 #[derive(Serialize, Error, Debug, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct ApiError {
     status_code: u16,
     errors: Vec<String>,
