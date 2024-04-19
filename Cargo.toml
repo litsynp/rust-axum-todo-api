@@ -2,8 +2,17 @@
 name = "rust-todo-api"
 version = "0.1.0"
 edition = "2021"
+default-run = "rust-todo-api"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "rust-todo-api"
+path = "src/main.rs"
+
+[[bin]]
+name = "add-user"
+path = "src/scripts/add-user/main.rs"
 
 [dependencies]
 axum = "0.7.5"
@@ -22,3 +31,4 @@ utoipa = { version = "4.2.0", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "6.0.0", features = ["axum"] }
 utoipa-redoc = { version = "3.0.0", features = ["axum"] }
 utoipa-rapidoc = { version = "3.0.0", features = ["axum"] }
+clap = { version = "4.5.4", features = ["derive"] }

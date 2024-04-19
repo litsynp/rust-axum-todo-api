@@ -62,3 +62,12 @@ You can also use RapiDoc at [`/rapidoc`](http://localhost:8000/rapidoc).
 - https://stackoverflow.com/questions/61561165/how-do-i-define-a-datetime-field-in-sqlx-rust
 
 - https://stackoverflow.com/questions/75640266/axum-query-extractor-allow-for-struct-with-optional-fields-to-be-parsed
+
+## CLI
+
+This project includes a CLI to add users to the database.
+
+```sh
+$ cargo run --bin add-user -- --email=user@example.com --nickname=user --password=1234
+Successfully registered user User { id: 1, email: "user@example.com", password: "1234", nickname: "user", created_at: 2024-04-19T17:14:54.358424Z, updated_at: 2024-04-19T17:14:54.358424Z, deleted_at: None }
+```
