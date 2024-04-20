@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "format": "prettier --write --ignore-unknown .",
-    "watch:tailwind": "npx tailwindcss -i styles/tailwind.css -o assets/main.css --watch"
+    "tailwind:build": "npx tailwindcss -i styles/tailwind.css -o assets/main.css",
+    "tailwind:watch": "npx tailwindcss -i styles/tailwind.css -o assets/main.css --watch"
   },
   "repository": {
     "type": "git",

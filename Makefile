@@ -7,18 +7,20 @@ watch:
 watch\:uninstall:
 	cargo uninstall cargo-watch
 
-db-up:
-	make db-down
+db\:up:
+	make db\:down
 	docker-compose up -d --remove-orphans
-db-down:
+db\:down:
 	docker-compose down
+db\:destroy:
+	docker-compose down -v
 
-migration-install:
+migration\:install:
 	cargo install sqlx-cli
-migration-up:
+migration\:up:
 	sqlx migrate run
 
-docs-open-swagger:
+docs\:open\:swagger:
 	open http://localhost:$(PORT)/swagger-ui
-docs-open-rapidoc:
+docs\:open\:rapidoc:
 	open http://localhost:$(PORT)/rapidoc
