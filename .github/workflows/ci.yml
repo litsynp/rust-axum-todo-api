@@ -1,9 +1,9 @@
 # https://github.com/actions-rs/example/blob/master/.github/workflows/quickstart.yml
 on:
   push:
-    branches: [ 'main', 'develop' ]
+    branches: ["main", "develop"]
   pull_request:
-    branches: [ 'main', 'develop' ]
+    branches: ["main", "develop"]
 
 name: CI
 
@@ -65,7 +65,6 @@ jobs:
           command: test
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/rust_todo_api_dev
-
 
   lints:
     name: Lints
