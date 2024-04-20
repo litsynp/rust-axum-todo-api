@@ -34,4 +34,5 @@ pub mod user {
 
 pub mod web {
     pub mod handlers;
+    mod html_template;
 }

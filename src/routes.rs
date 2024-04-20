@@ -5,6 +5,7 @@ use axum::{
 };
 use serde_json::json;
 use sqlx::{Pool, Postgres};
+use tower_http::services::ServeDir;
 use utoipa::{
     openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
     Modify, OpenApi,
@@ -120,8 +121,16 @@ pub fn build_routes(pool: Pool<Postgres>) -> Router {
                 .route("/", post(user::handlers::register_user)),
         );
 
+    let assets_path = std::env::current_dir().unwrap();
+
     Router::new()
         .route("/", get(web::handlers::index))
+        .route("/login", get(web::handlers::login))
+        .route("/register", get(web::handlers::register))
+        .nest_service(
+            "/assets",
+            ServeDir::new(format!("{}/assets", assets_path.to_str().unwrap())),
+        )
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         // .merge(Redoc::with_url("/redoc", ApiDoc::openapi()))  // Uncomment to enable Redoc
         // There is no need to create `RapiDoc::with_openapi` because the OpenApi is served

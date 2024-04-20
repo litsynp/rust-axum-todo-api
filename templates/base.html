@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link href="/assets/main.css" rel="stylesheet" />
+    <title>{% block title %}{{ title }}{% endblock %}</title>
+
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <main
+      id="content"
+      class="w-full h-full flex flex-col items-center justify-center px-4 py-8"
+    >
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+
+  {% block ending %}{% endblock %}
+</html>

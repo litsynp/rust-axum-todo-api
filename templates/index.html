@@ -1,7 +1,149 @@
-<!DOCTYPE html>
-<html lang="en">
-<body>
-<h1>Todo App</h1>
-<p>Index page</p>
-</body>
-</html>
+{% extends "base.html" %} {% block title %}Todo App{% endblock %} {% block
+content %}
+<h2>Todo App</h2>
+<div id="auth-buttons" class="flex justify-end"></div>
+
+<form
+  class="w-full max-w-sm mt-4"
+  action="/api/todos"
+  method="post"
+  onsubmit="fetchCreateTodo(event)"
+>
+  <input
+    class="w-full px-3 py-2 border border-gray-300 rounded"
+    type="text"
+    name="title"
+    placeholder="Title"
+  />
+  <textarea
+    class="w-full mt-4 px-3 py-2 border border-gray-300 rounded"
+    name="description"
+    placeholder="Description"
+  ></textarea>
+  <button
+    class="w-full mt-4 px-3 py-2 bg-blue-500 text-white rounded"
+    type="submit"
+  >
+    Add
+  </button>
+</form>
+
+<div id="todos" class="w-full mt-4 flex flex-col items-center"></div>
+
+{% endblock %} {% block ending %}
+<script src="/assets/scripts/auth.js"></script>
+<script src="/assets/scripts/todos.js"></script>
+
+<script>
+  function createTodoElement(todo) {
+    const todoElement = document.createElement("div");
+    todoElement.className = "w-96 mt-4 p-4 border border-gray-300 rounded";
+
+    const titleElement = document.createElement("h3");
+    titleElement.textContent = todo.title;
+    titleElement.className = todo.completed ? "line-through" : "";
+    todoElement.appendChild(titleElement);
+
+    const descriptionElement = document.createElement("p");
+    descriptionElement.textContent = todo.description;
+    descriptionElement.className = todo.completed ? "line-through" : "";
+    todoElement.appendChild(descriptionElement);
+
+    const createdAtElement = document.createElement("p");
+    createdAtElement.textContent = new Date(todo.createdAt).toLocaleString();
+    todoElement.appendChild(createdAtElement);
+
+    const actionContainer = document.createElement("div");
+    actionContainer.className = "flex justify-between";
+    todoElement.appendChild(actionContainer);
+
+    // Complete button
+    const completeButton = document.createElement("button");
+    completeButton.className = "mt-4 px-3 py-2 bg-blue-500 text-white rounded";
+    completeButton.textContent = todo.completed ? "Uncomplete" : "Complete";
+    completeButton.onclick = async () => {
+      await editTodo(todo.id, {
+        title: todo.title,
+        description: todo.description,
+        completed: !todo.completed,
+      });
+
+      fetchFindTodos();
+    };
+    actionContainer.appendChild(completeButton);
+
+    // Delete button
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "mt-4 px-3 py-2 bg-red-500 text-white rounded";
+    deleteButton.textContent = "Delete";
+    deleteButton.onclick = async () => {
+      if (!confirm("Are you sure you want to delete this todo?")) {
+        return;
+      }
+
+      await deleteTodo(todo.id);
+      fetchFindTodos();
+    };
+    actionContainer.appendChild(deleteButton);
+
+    return todoElement;
+  }
+
+  function fetchCreateTodo(event) {
+    event.preventDefault();
+    const title = event.target.title.value;
+    const description = event.target.description.value;
+    createTodo({
+      title,
+      description,
+    }).then((todo) => {
+      const todoElement = createTodoElement(todo);
+      document.getElementById("todos").appendChild(todoElement);
+    });
+  }
+
+  async function fetchFindTodos() {
+    document.getElementById("todos").innerHTML = "";
+
+    const todos = await findTodos();
+
+    todos.items.forEach((todo) => {
+      const todoElement = createTodoElement(todo);
+      const container = document.getElementById("todos");
+      container.appendChild(todoElement);
+    });
+  }
+
+  fetchFindTodos();
+</script>
+
+<script>
+  function showLoginOrLogout() {
+    if (isAuth()) {
+      document.getElementById("auth-buttons").appendChild(createLogoutButton());
+    } else {
+      document.getElementById("auth-buttons").appendChild(createLoginButton());
+    }
+  }
+
+  function createLogoutButton() {
+    const logoutButton = document.createElement("button");
+    logoutButton.className =
+      "logout-button mt-4 px-5 py-2 bg-blue-500 text-white rounded";
+    logoutButton.textContent = "Logout";
+    logoutButton.onclick = logout;
+    return logoutButton;
+  }
+
+  function createLoginButton() {
+    const loginButton = document.createElement("a");
+    loginButton.className =
+      "login-button mt-4 px-3 py-2 bg-blue-500 text-white rounded";
+    loginButton.textContent = "Login";
+    loginButton.href = "/login";
+    return loginButton;
+  }
+
+  showLoginOrLogout();
+</script>
+{% endblock %}

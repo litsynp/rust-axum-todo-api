@@ -1,0 +1,26 @@
+{
+  "name": "rust-axum-todo-api",
+  "version": "1.0.0",
+  "description": "A Rust example of a todo application with axum and sqlx.",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write --ignore-unknown .",
+    "watch:tailwind": "npx tailwindcss -i styles/tailwind.css -o assets/main.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/litsynp/rust-axum-todo-api.git"
+  },
+  "author": "litsynp",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/litsynp/rust-axum-todo-api/issues"
+  },
+  "homepage": "https://github.com/litsynp/rust-axum-todo-api#readme",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.14",
+    "tailwindcss": "^3.4.3"
+  }
+}

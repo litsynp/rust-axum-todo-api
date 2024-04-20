@@ -1,0 +1,38 @@
+{% extends "base.html" %} {% block title %}Register{% endblock %} {% block head
+%}
+<link href="/assets/scripts/auth.js" rel="script" />
+{% endblock %} {% block content %}
+<h2>Register</h2>
+<!-- call POST /api/users -->
+<form
+  class="w-full max-w-sm mt-4"
+  action="/api/users"
+  method="post"
+  onsubmit="register(event)"
+>
+  <input
+    class="w-full px-3 py-2 border border-gray-300 rounded"
+    type="text"
+    name="email"
+    placeholder="Email"
+  />
+  <input
+    class="w-full mt-4 px-3 py-2 border border-gray-300 rounded"
+    type="text"
+    name="nickname"
+    placeholder="Nickname"
+  />
+  <input
+    class="w-full mt-4 px-3 py-2 border border-gray-300 rounded"
+    type="password"
+    name="password"
+    placeholder="Password"
+  />
+  <button
+    class="w-full mt-4 px-3 py-2 bg-blue-500 text-white rounded"
+    type="submit"
+  >
+    Register
+  </button>
+</form>
+{% endblock %}
