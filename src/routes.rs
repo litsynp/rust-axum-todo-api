@@ -17,7 +17,7 @@ use rust_todo_api::{
     auth::{self, models::JWT_SECRET},
     common,
     common::middlewares::{auth_middleware, AuthState},
-    todo, user,
+    todo, user, web,
 };
 
 pub fn build_routes(pool: Pool<Postgres>) -> Router {
@@ -121,6 +121,7 @@ pub fn build_routes(pool: Pool<Postgres>) -> Router {
         );
 
     Router::new()
+        .route("/", get(web::handlers::index))
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         // .merge(Redoc::with_url("/redoc", ApiDoc::openapi()))  // Uncomment to enable Redoc
         // There is no need to create `RapiDoc::with_openapi` because the OpenApi is served

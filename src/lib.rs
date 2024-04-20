@@ -31,3 +31,7 @@ pub mod user {
     pub mod service;
     pub mod views;
 }
+
+pub mod web {
+    pub mod handlers;
+}

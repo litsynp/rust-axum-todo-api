@@ -32,3 +32,4 @@ utoipa-swagger-ui = { version = "6.0.0", features = ["axum"] }
 utoipa-redoc = { version = "3.0.0", features = ["axum"] }
 utoipa-rapidoc = { version = "3.0.0", features = ["axum"] }
 clap = { version = "4.5.4", features = ["derive"] }
+askama = "0.12.1"
