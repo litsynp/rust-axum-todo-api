@@ -11,3 +11,7 @@ assets/main.css
 
 # macOS
 .DS_Store
+
+# direnv
+.envrc
+.direnv/
