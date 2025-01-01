@@ -86,6 +86,7 @@ pub fn build_routes(pool: Pool<Postgres>) -> Router {
         jwt_secret: JWT_SECRET.to_string(),
     };
 
+    let user_service = user::service::UserService::new(pool.clone());
     let todo_service = todo::service::TodoService::new(pool.clone());
 
     let api_routes = Router::new()
@@ -122,6 +123,7 @@ pub fn build_routes(pool: Pool<Postgres>) -> Router {
                 )
                 .route("/", post(user::handlers::register_user)),
         )
+        .layer(Extension(user_service))
         .layer(Extension(todo_service));
 
     let assets_path = std::env::current_dir().unwrap();

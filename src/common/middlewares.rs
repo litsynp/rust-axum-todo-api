@@ -1,8 +1,10 @@
 use axum::body::Body;
+use axum::Extension;
 use axum::{extract::State, http::Request, middleware::Next, response::Response};
 use sqlx::{Pool, Postgres};
 
-use crate::{auth::utils::validate_token, common::errors::ApiError, user::service as user_service};
+use crate::user::service::UserService;
+use crate::{auth::utils::validate_token, common::errors::ApiError};
 
 pub struct AuthState {
     pub pool: Pool<Postgres>,
@@ -19,7 +21,11 @@ impl Clone for AuthState {
 }
 
 pub async fn auth_middleware(
-    State(AuthState { pool, jwt_secret }): State<AuthState>,
+    State(AuthState {
+        pool: _,
+        jwt_secret,
+    }): State<AuthState>,
+    Extension(user_service): Extension<UserService>,
     mut req: Request<Body>,
     next: Next,
 ) -> Result<Response, ApiError> {
@@ -40,7 +46,7 @@ pub async fn auth_middleware(
         Err(err) => return Err(ApiError::new_unauthorized(err.to_string())),
     };
 
-    let user = user_service::find_user_by_id(pool, claims.user_id).await;
+    let user = user_service.find_user_by_id(claims.user_id).await;
 
     match user {
         Ok(user) => {

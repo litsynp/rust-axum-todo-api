@@ -1,16 +1,15 @@
 use axum::{
     extract::{Query, State},
-    Json,
+    Extension, Json,
 };
 use utoipa::IntoParams;
 
 use crate::{
     common::{errors::ApiError, middlewares::AuthState},
-    user::{
-        service as user_service,
-        views::{NewUserRequest, UserView},
-    },
+    user::views::{NewUserRequest, UserView},
 };
+
+use super::service::UserService;
 
 /// Register user
 #[utoipa::path(
@@ -27,10 +26,11 @@ use crate::{
     )
 )]
 pub async fn register_user(
-    State(state): State<AuthState>,
+    State(_state): State<AuthState>,
+    Extension(user_service): Extension<UserService>,
     Json(request): Json<NewUserRequest>,
 ) -> Result<Json<UserView>, ApiError> {
-    let user = user_service::register_user(state.pool, request).await;
+    let user = user_service.register_user(request).await;
 
     match user {
         Ok(user) => Ok(Json(UserView::from(user))),
@@ -69,7 +69,8 @@ pub struct FindUserQuery {
     security(("api_key" = []))
 )]
 pub async fn find_user_by_email(
-    State(state): State<AuthState>,
+    State(_state): State<AuthState>,
+    Extension(user_service): Extension<UserService>,
     Query(query): Query<FindUserQuery>,
 ) -> Result<Json<UserView>, ApiError> {
     let email = query.email;
@@ -83,7 +84,7 @@ pub async fn find_user_by_email(
         }
     };
 
-    let user = user_service::find_user_by_email(state.pool, email.as_str()).await;
+    let user = user_service.find_user_by_email(email.as_str()).await;
 
     match user {
         Ok(user) => Ok(Json(UserView::from(user))),

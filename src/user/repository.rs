@@ -1,9 +1,9 @@
-use sqlx::PgPool;
+use sqlx::PgConnection;
 
 use crate::user::{models::User, views::NewUserRequest};
 
 pub async fn register_user(
-    pool: PgPool,
+    conn: &mut PgConnection,
     new_user_request: NewUserRequest,
 ) -> Result<User, sqlx::Error> {
     let user = sqlx::query_as::<_, User>(
@@ -27,14 +27,14 @@ pub async fn register_user(
     .bind(new_user_request.email)
     .bind(new_user_request.password)
     .bind(new_user_request.nickname)
-    .fetch_one(&pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(user)
 }
 
 pub async fn find_user_by_email_and_password(
-    pool: PgPool,
+    conn: &mut PgConnection,
     email: &str,
     password: &str,
 ) -> Result<User, sqlx::Error> {
@@ -52,13 +52,13 @@ pub async fn find_user_by_email_and_password(
     )
     .bind(email)
     .bind(password)
-    .fetch_one(&pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(user)
 }
 
-pub async fn find_user_by_email(pool: PgPool, email: &str) -> Result<User, sqlx::Error> {
+pub async fn find_user_by_email(conn: &mut PgConnection, email: &str) -> Result<User, sqlx::Error> {
     let user = sqlx::query_as::<_, User>(
         "
             SELECT
@@ -71,13 +71,13 @@ pub async fn find_user_by_email(pool: PgPool, email: &str) -> Result<User, sqlx:
             ",
     )
     .bind(email)
-    .fetch_one(&pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(user)
 }
 
-pub async fn find_user_by_id(pool: PgPool, id: i32) -> Result<User, sqlx::Error> {
+pub async fn find_user_by_id(conn: &mut PgConnection, id: i32) -> Result<User, sqlx::Error> {
     let user = sqlx::query_as::<_, User>(
         "
             SELECT
@@ -90,7 +90,7 @@ pub async fn find_user_by_id(pool: PgPool, id: i32) -> Result<User, sqlx::Error>
             ",
     )
     .bind(id)
-    .fetch_one(&pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(user)

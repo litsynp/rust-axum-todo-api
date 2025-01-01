@@ -1,9 +1,13 @@
-use axum::{extract::State, Json};
+use axum::{extract::State, Extension, Json};
 
 use crate::{
-    auth::{models::JWT_SECRET, utils, views::LoginRequest, views::TokenView},
+    auth::{
+        models::JWT_SECRET,
+        utils,
+        views::{LoginRequest, TokenView},
+    },
     common::{errors::ApiError, middlewares::AuthState},
-    user::service as user_service,
+    user::service::UserService,
 };
 
 static ACCESS_EXPIRY: usize = 60 * 60 * 100000000;
@@ -22,12 +26,13 @@ static REFRESH_EXPIRY: usize = 24 * 60 * 60 * 100000000;
     )
 )]
 pub async fn get_tokens(
-    State(store): State<AuthState>,
+    State(_store): State<AuthState>,
+    Extension(user_service): Extension<UserService>,
     Json(request): Json<LoginRequest>,
 ) -> Result<Json<TokenView>, ApiError> {
     let LoginRequest { email, password } = request;
 
-    let user = user_service::login(store.pool, &email, &password).await;
+    let user = user_service.login(&email, &password).await;
 
     match user {
         Ok(user) => {

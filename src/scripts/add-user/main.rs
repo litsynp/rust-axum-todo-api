@@ -1,6 +1,5 @@
 use clap::Parser;
 use rust_todo_api::infrastructure::database;
-use rust_todo_api::user::service::register_user;
 use rust_todo_api::user::views::NewUserRequest;
 
 #[tokio::main]
@@ -18,15 +17,14 @@ async fn main() {
             )
         });
 
-    match register_user(
-        pool,
-        NewUserRequest {
+    let user_service = rust_todo_api::user::service::UserService::new(pool);
+    match user_service
+        .register_user(NewUserRequest {
             email: args.email,
             nickname: args.nickname,
             password: args.password,
-        },
-    )
-    .await
+        })
+        .await
     {
         Ok(user) => println!("Successfully registered user {:?}", user),
         Err(e) => println!("Failed to create user {}", e),
