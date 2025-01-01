@@ -4,7 +4,7 @@ A Rust example of a todo application with axum and sqlx.
 
 ## Requirements
 
-- Rust
+- Rust 1.83+
 - Postgres
 - sqlx
 - sqlx-cli
