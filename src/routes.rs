@@ -1,7 +1,7 @@
 use axum::{
     middleware::{self},
     routing::{get, post},
-    Json, Router,
+    Extension, Json, Router,
 };
 use serde_json::json;
 use sqlx::{Pool, Postgres};
@@ -82,9 +82,11 @@ pub fn build_routes(pool: Pool<Postgres>) -> Router {
     }
 
     let auth_state = AuthState {
-        pool,
+        pool: pool.clone(),
         jwt_secret: JWT_SECRET.to_string(),
     };
+
+    let todo_service = todo::service::TodoService::new(pool.clone());
 
     let api_routes = Router::new()
         .nest(
@@ -119,7 +121,8 @@ pub fn build_routes(pool: Pool<Postgres>) -> Router {
                     ),
                 )
                 .route("/", post(user::handlers::register_user)),
-        );
+        )
+        .layer(Extension(todo_service));
 
     let assets_path = std::env::current_dir().unwrap();
 

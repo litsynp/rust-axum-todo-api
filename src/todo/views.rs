@@ -27,14 +27,14 @@ impl From<Todo> for TodoView {
     }
 }
 
-#[derive(sqlx::FromRow, Deserialize, Serialize, ToSchema)]
+#[derive(sqlx::FromRow, Deserialize, Serialize, ToSchema, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct NewTodoRequest {
     pub title: String,
     pub description: String,
 }
 
-#[derive(sqlx::FromRow, Deserialize, Serialize, ToSchema)]
+#[derive(sqlx::FromRow, Deserialize, Serialize, ToSchema, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EditTodoRequest {
     pub title: String,

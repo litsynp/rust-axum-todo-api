@@ -1,16 +1,15 @@
 use axum::{
     extract::{Path, Query, State},
-    Json,
+    Extension, Json,
 };
 
 use crate::common::pagination::PaginatedView;
 use crate::{
     common::{errors::ApiError, middlewares::AuthState, pagination::PaginationParams},
-    todo::{
-        service as todo_service,
-        views::{EditTodoRequest, NewTodoRequest, TodoView},
-    },
+    todo::views::{EditTodoRequest, NewTodoRequest, TodoView},
 };
+
+use super::service::TodoService;
 
 /// Create todo
 #[utoipa::path(
@@ -27,10 +26,11 @@ use crate::{
     security(("api_key" = []))
 )]
 pub async fn create_todo(
-    State(state): State<AuthState>,
+    State(_state): State<AuthState>,
+    Extension(todo_service): Extension<TodoService>,
     Json(todo): Json<NewTodoRequest>,
 ) -> Result<Json<TodoView>, ApiError> {
-    let todo = todo_service::create_todo(state.pool, todo).await;
+    let todo = todo_service.create_todo(todo).await;
 
     match todo {
         Ok(todo) => Ok(Json(TodoView::from(todo))),
@@ -53,12 +53,13 @@ pub async fn create_todo(
     security(("api_key" = []))
 )]
 pub async fn find_todos(
-    State(state): State<AuthState>,
+    State(_state): State<AuthState>,
+    Extension(todo_service): Extension<TodoService>,
     Query(query): Query<PaginationParams>,
 ) -> Result<Json<PaginatedView<TodoView>>, ApiError> {
     let (page, size) = (query.page.unwrap_or(1), query.size.unwrap_or(10));
 
-    let todos = todo_service::find_todos(state.pool, page, size).await;
+    let todos = Extension(todo_service).find_todos(page, size).await;
 
     match todos {
         Ok(todos) => Ok(Json(PaginatedView {
@@ -88,10 +89,11 @@ pub async fn find_todos(
     security(("api_key" = []))
 )]
 pub async fn find_todo_by_id(
-    State(state): State<AuthState>,
+    State(_state): State<AuthState>,
+    Extension(todo_service): Extension<TodoService>,
     Path(id): Path<i32>,
 ) -> Result<Json<TodoView>, ApiError> {
-    let todo = todo_service::find_todo_by_id(state.pool, id).await;
+    let todo = Extension(todo_service).find_todo_by_id(id).await;
 
     match todo {
         Ok(todo) => Ok(Json(TodoView::from(todo))),
@@ -124,11 +126,12 @@ pub async fn find_todo_by_id(
     security(("api_key" = []))
 )]
 pub async fn edit_todo_by_id(
-    State(state): State<AuthState>,
+    State(_state): State<AuthState>,
+    Extension(todo_service): Extension<TodoService>,
     Path(id): Path<i32>,
     Json(todo): Json<EditTodoRequest>,
 ) -> Result<Json<TodoView>, ApiError> {
-    let todo = todo_service::edit_todo_by_id(state.pool, id, todo).await;
+    let todo = Extension(todo_service).edit_todo_by_id(id, todo).await;
 
     match todo {
         Ok(todo) => Ok(Json(TodoView::from(todo))),
@@ -159,10 +162,11 @@ pub async fn edit_todo_by_id(
     security(("api_key" = []))
 )]
 pub async fn delete_todo_by_id(
-    State(state): State<AuthState>,
+    State(_state): State<AuthState>,
+    Extension(todo_service): Extension<TodoService>,
     Path(id): Path<i32>,
 ) -> Result<(), ApiError> {
-    let result = todo_service::delete_todo_by_id(state.pool, id).await;
+    let result = Extension(todo_service).delete_todo_by_id(id).await;
 
     match result {
         Ok(_) => Ok(()),

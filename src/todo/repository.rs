@@ -1,11 +1,14 @@
-use sqlx::PgPool;
+use sqlx::PgConnection;
 
 use crate::todo::{
     models::Todo,
     views::{EditTodoRequest, NewTodoRequest},
 };
 
-pub async fn create_todo(pool: PgPool, new_todo: NewTodoRequest) -> Result<Todo, sqlx::Error> {
+pub async fn create_todo(
+    conn: &mut PgConnection,
+    new_todo: NewTodoRequest,
+) -> Result<Todo, sqlx::Error> {
     let todo = sqlx::query_as::<_, Todo>(
         "
             INSERT INTO
@@ -24,13 +27,17 @@ pub async fn create_todo(pool: PgPool, new_todo: NewTodoRequest) -> Result<Todo,
     )
     .bind(new_todo.title)
     .bind(new_todo.description)
-    .fetch_one(&pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(todo)
 }
 
-pub async fn find_todos(pool: PgPool, page: i32, size: i32) -> Result<Vec<Todo>, sqlx::Error> {
+pub async fn find_todos(
+    conn: &mut PgConnection,
+    page: i32,
+    size: i32,
+) -> Result<Vec<Todo>, sqlx::Error> {
     let todos = sqlx::query_as::<_, Todo>(
         "
             SELECT
@@ -47,13 +54,13 @@ pub async fn find_todos(pool: PgPool, page: i32, size: i32) -> Result<Vec<Todo>,
     )
     .bind((page - 1) * size)
     .bind(size)
-    .fetch_all(&pool)
+    .fetch_all(conn)
     .await?;
 
     Ok(todos)
 }
 
-pub async fn find_todo_by_id(pool: PgPool, id: i32) -> Result<Todo, sqlx::Error> {
+pub async fn find_todo_by_id(conn: &mut PgConnection, id: i32) -> Result<Todo, sqlx::Error> {
     let todo = sqlx::query_as::<_, Todo>(
         "
             SELECT
@@ -65,14 +72,14 @@ pub async fn find_todo_by_id(pool: PgPool, id: i32) -> Result<Todo, sqlx::Error>
             ",
     )
     .bind(id)
-    .fetch_one(&pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(todo)
 }
 
-pub(crate) async fn edit_todo_by_id(
-    pool: PgPool,
+pub async fn edit_todo_by_id(
+    conn: &mut PgConnection,
     id: i32,
     edited_todo: EditTodoRequest,
 ) -> Result<Todo, sqlx::Error> {
@@ -95,13 +102,13 @@ pub(crate) async fn edit_todo_by_id(
     .bind(edited_todo.description)
     .bind(edited_todo.completed)
     .bind(id)
-    .fetch_one(&pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(todo)
 }
 
-pub async fn delete_todo_by_id(pool: PgPool, id: i32) -> Result<(), sqlx::Error> {
+pub async fn delete_todo_by_id(conn: &mut PgConnection, id: i32) -> Result<(), sqlx::Error> {
     sqlx::query(
         "
             DELETE FROM
@@ -111,7 +118,7 @@ pub async fn delete_todo_by_id(pool: PgPool, id: i32) -> Result<(), sqlx::Error>
             ",
     )
     .bind(id)
-    .execute(&pool)
+    .execute(conn)
     .await?;
 
     Ok(())
